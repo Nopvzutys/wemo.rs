@@ -16,7 +16,7 @@ use std::sync::RwLock;
 use super::SerialNumber;
 use super::state::WemoState::{Off, On, OnWithoutLoad};
 use super::state::WemoState;
-use time::PreciseTime;
+use time::OffsetDateTime;
 use url::ParseError;
 use xml::find_tag_value;
 
@@ -361,7 +361,7 @@ impl Switch {
 
   // TODO: Make private.
   pub fn get_state_with_retry(&self, timeout: Duration) -> WemoResult {
-    let mut start = PreciseTime::now();
+    let mut start = OffsetDateTime::now();
 
     // TODO: use the minimum of the timestamps
     let result = self.get_state(Duration::milliseconds(FIRST_ATTEMPT_TIMEOUT));
@@ -371,7 +371,7 @@ impl Switch {
       Err(_) => {}, // TODO
     }
 
-    let mut elapsed = start.to(PreciseTime::now());
+    let mut elapsed = start.to(OffsetDateTime::now());
 
     if elapsed > timeout {
       return Err(WemoError::TimeoutError);
@@ -382,14 +382,14 @@ impl Switch {
       return Err(WemoError::TimeoutError);
     }
 
-    start = PreciseTime::now();
+    start = OffsetDateTime::now_utc();
 
     let switch = match self.relocate(remaining) {
       None => { return Err(WemoError::TimeoutError); }, // TODO: Wrong.
       Some(s) => { s },
     };
 
-    elapsed = start.to(PreciseTime::now());
+    elapsed = OffsetDateTime::now_utc() - start;
     if elapsed > remaining {
       return Err(WemoError::TimeoutError);
     }
@@ -405,7 +405,7 @@ impl Switch {
   // TODO: Make private
   pub fn set_state_with_retry(&self, state: WemoState, timeout: Duration)
       -> WemoResult {
-    let mut start = PreciseTime::now();
+    let mut start = OffsetDateTime::now_utc();
 
     // TODO: use the minimum of the timestamps
     let result = self.set_state(state.clone(),
@@ -416,7 +416,7 @@ impl Switch {
       Err(_) => {}, // TODO: Return type
     }
 
-    let mut elapsed = start.to(PreciseTime::now());
+    let mut elapsed = OffsetDateTime::now_utc() - start;
 
     if elapsed > timeout {
       return Err(WemoError::TimeoutError);
@@ -427,7 +427,7 @@ impl Switch {
       return Err(WemoError::TimeoutError);
     }
 
-    start = PreciseTime::now();
+    start = OffsetDateTime::now_utc();
 
     let switch = match self.relocate(remaining) {
       None => {
@@ -436,7 +436,7 @@ impl Switch {
       Some(s) => { s },
     };
 
-    elapsed = start.to(PreciseTime::now());
+    elapsed = OffsetDateTime::now_utc() - start;
     if elapsed > remaining {
       return Err(WemoError::TimeoutError);
     }

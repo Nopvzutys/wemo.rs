@@ -1,6 +1,6 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
 
-#![doc(html_logo_url = "http://i.imgur.com/bkgoCdy.png", 
+#![doc(html_logo_url = "http://i.imgur.com/bkgoCdy.png",
        html_favicon_url = "http://i.imgur.com/bkgoCdy.png")]
 
 #[cfg(feature = "subscriptions")] extern crate get_if_addrs;
@@ -15,7 +15,7 @@ extern crate regex;
 // Re-export from the time crate.
 pub mod time {
   extern crate time;
-  pub use self::time::{Duration, PreciseTime};
+  pub use self::time::{Duration, OffsetDateTime};
 }
 
 // Re-export from the url crate.
